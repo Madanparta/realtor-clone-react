@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { FaEyeSlash,FaEye  } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import OAuth from '../components/OAuth';
+
+import {db} from '../firebase'
+
+import { getAuth,createUserWithEmailAndPassword,updateProfile } from "firebase/auth";
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 
 const SignUp = () => {
   const [showPassword,setShowPassword]=useState(false)
@@ -10,6 +16,7 @@ const SignUp = () => {
     password:"",
     name:''
   });
+
 
   const {email,name,password}=formData;
   const onChange = (e) =>{
@@ -21,6 +28,35 @@ const SignUp = () => {
   }
 
   // console.log(formData)
+
+  const navigate = useNavigate()
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+
+    try {
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      updateProfile(auth.currentUser,{
+        displayName:name
+      })
+      const user = userCredential.user
+      const formDataCopy = {...formData}
+      delete formData.password
+      formDataCopy.timestamp = serverTimestamp();
+
+      await setDoc(doc(db,"users",user.uid),formDataCopy)
+
+      toast.success('Sign up was successully')
+
+      navigate('/')
+    } catch (error) {
+      // const errorCode = error.code;
+      // console.log(error)
+      toast.error(error.message)
+      
+    }
+  }
   return (
     <div>
       <section>
@@ -32,10 +68,10 @@ const SignUp = () => {
           </div>
 
           <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-            <form >
+            <form onSubmit={onSubmit}>
 
             <div className='mb-6'>
-                <input className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out" type='text' id='text' value={name} onChange={onChange} placeholder='Full name' />
+                <input className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out" type='text' id='name' value={name} onChange={onChange} placeholder='Full name' />
               </div>
 
               <div className='mb-6'>
