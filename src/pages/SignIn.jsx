@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { FaEyeSlash,FaEye  } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import OAuth from '../components/OAuth';
+import {signInWithEmailAndPassword,getAuth} from 'firebase/auth';
+import {toast} from 'react-toastify';
 
 const SignIn = () => {
 
@@ -22,6 +24,21 @@ const SignIn = () => {
 
   // console.log(formData)
 
+  const navigate = useNavigate()
+
+  const onsubmit = async(e)=> {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+      const userCredential = await signInWithEmailAndPassword(auth,email,password);
+      if(userCredential.user){
+        navigate('/')
+      }
+    } catch (error) {
+      toast.error("bad user creadentials")
+    }
+  }
+
   return (
     <div>
       <section>
@@ -33,7 +50,7 @@ const SignIn = () => {
           </div>
 
           <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-            <form >
+            <form onClick={onsubmit}>
 
               <div className='mb-6'>
                 <input className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out" type='email' id='email' value={email} onChange={onChange} placeholder='Email address' />
