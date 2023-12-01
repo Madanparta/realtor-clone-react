@@ -9,6 +9,7 @@ import Offers from './pages/Offers'
 import ForgotPassword from './pages/ForgotPassword'
 import Header from './components/Header';
 import PrivateRoute from './components/PrivateRoute'
+import CreateLinsting from './pages/CreateLinsting'
 
 
 const App = () => {
@@ -26,6 +27,7 @@ const App = () => {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/offers" element={<Offers />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/create-listing" element={<CreateLinsting />} />
       </Routes>
     </>
   );
